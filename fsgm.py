@@ -206,6 +206,9 @@ if __name__ == '__main__':
             clean_spec = inputs.data.cpu().numpy()
             np.save(spec_path+'clean/'+spec_filelist[i], clean_spec)
             print('clean spec saved!!')
+            fsgmed = fsgm(inputs.data.cpu().numpy(), inputs.grad.data.cpu().numpy(), 0.25)
+            np.save(spec_path+'fsgm/'+spec_filelist[i]+'0.25', fsgmed)
+            print('fsgm spec saved!!')
 
             torch.nn.utils.clip_grad_norm(model.parameters(), args.max_norm)
             # SGD step
@@ -238,7 +241,7 @@ if __name__ == '__main__':
         print('Training Summary Epoch: [{0}]\t'
               'Average Loss {loss:.3f}\t'.format(
             epoch + 1, loss=avg_loss))
-
+        '''
         start_iter = 0  # Reset start iteration for next epoch
         total_cer, total_wer = 0, 0
         model.eval()
@@ -310,3 +313,4 @@ if __name__ == '__main__':
         if not args.no_shuffle:
             print("Shuffling batches...")
             train_sampler.shuffle()
+        '''
