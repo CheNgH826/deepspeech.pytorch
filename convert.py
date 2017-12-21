@@ -35,7 +35,6 @@ if __name__ == "__main__":
 	#figsize		= args.figsize
 	if not os.path.exists(outdir):
 		os.mkdir(outdir)
-	
 	spec2audio(spec)
 
     

@@ -22,14 +22,16 @@ def spectrogram2wav(spectrogram):
     '''
     spectrogram = spectrogram.T  # [f, t]
     X_best = copy.deepcopy(spectrogram)  # [f, t]
-    for i in range(30):
-        X_t = invert_spectrogram(X_best)
-        est = librosa.stft(X_t, 320, 160, win_length=320)  # [f, t]
-        phase = est / np.maximum(1e-8, np.abs(est))  # [f, t]
-        X_best = spectrogram * phase  # [f, t]
+    #for i in range(30):
+    X_t = invert_spectrogram(X_best)
+    shape = X_t.shape
+    est = librosa.stft(X_t, 320, 160, win_length=320)  # [f, t]
+    phase = est / np.maximum(1e-8, np.abs(est))  # [f, t]
+    phase = np.concatenate((phase, np.ones((161, X_best.shape[0]-161))), axis=1)
+    X_best = spectrogram.T * phase  # [f, t]
     X_t = invert_spectrogram(X_best)
 
-    return np.real(X_t)
+    return X_t
 
 def invert_spectrogram(spectrogram):
     '''
