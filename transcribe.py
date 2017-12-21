@@ -1,5 +1,7 @@
 import argparse
 import warnings
+import torch
+import numpy as np
 
 warnings.simplefilter('ignore')
 
@@ -13,10 +15,12 @@ import os.path
 import json
 
 parser = argparse.ArgumentParser(description='DeepSpeech transcription')
-parser.add_argument('--model_path', default='models/deepspeech_final.pth.tar',
+parser.add_argument('--model_path', default='models/librispeech_pretrained.pth',
                     help='Path to model file created by training')
-parser.add_argument('--audio_path', default='audio.wav',
-                    help='Audio file to predict on')
+#parser.add_argument('--audio_path', default='audio.wav',
+#                    help='Audio file to predict on')
+parser.add_argument('--spec_path', default='spec.npy',
+                    help='spectrogram npy file to predict on')
 parser.add_argument('--cuda', action="store_true", help='Use cuda to test model')
 parser.add_argument('--decoder', default="greedy", choices=["greedy", "beam"], type=str, help="Decoder to use")
 parser.add_argument('--offsets', dest='offsets', action='store_true', help='Returns time offset information')
@@ -34,7 +38,6 @@ beam_args.add_argument('--cutoff_prob', default=1.0, type=float,
                        help='Cutoff probability in pruning,default 1.0, no pruning.')
 beam_args.add_argument('--lm_workers', default=1, type=int, help='Number of LM processes to use')
 args = parser.parse_args()
-
 
 def decode_results(decoded_output, decoded_offsets):
     results = {
@@ -83,8 +86,11 @@ if __name__ == '__main__':
 
     parser = SpectrogramParser(audio_conf, normalize=True)
 
-    spect = parser.parse_audio(args.audio_path).contiguous()
-    spect = spect.view(1, 1, spect.size(0), spect.size(1))
+    #spect = parser.parse_audio(args.audio_path).contiguous()
+    #spect = spect.view(1, 1, spect.size(0), spect.size(1))
+    ######
+    spect = torch.from_numpy(np.load(args.spec_path).reshape(1,1,161,-1))
+    ######
     out = model(Variable(spect, volatile=True))
     out = out.transpose(0, 1)  # TxNxH
     decoded_output, decoded_offsets = decoder.decode(out.data)

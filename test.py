@@ -2,6 +2,7 @@ import argparse
 
 import numpy as np
 from torch.autograd import Variable
+import torch
 from tqdm import tqdm
 
 from decoder import GreedyDecoder
@@ -10,12 +11,12 @@ from data.data_loader import SpectrogramDataset, AudioDataLoader
 from model import DeepSpeech
 
 parser = argparse.ArgumentParser(description='DeepSpeech transcription')
-parser.add_argument('--model_path', default='models/deepspeech_final.pth.tar',
+parser.add_argument('--model_path', default='models/librispeech_pretrained.pth',
                     help='Path to model file created by training')
 parser.add_argument('--cuda', action="store_true", help='Use cuda to test model')
 parser.add_argument('--test_manifest', metavar='DIR',
                     help='path to validation manifest csv', default='data/test_manifest.csv')
-parser.add_argument('--batch_size', default=20, type=int, help='Batch size for training')
+parser.add_argument('--batch_size', default=1, type=int, help='Batch size for training')
 parser.add_argument('--num_workers', default=4, type=int, help='Number of workers used in dataloading')
 parser.add_argument('--decoder', default="greedy", choices=["greedy", "beam", "none"], type=str, help="Decoder to use")
 parser.add_argument('--verbose', action="store_true", help="print out decoded output and error of each sample")
@@ -36,6 +37,15 @@ beam_args.add_argument('--cutoff_prob', default=1.0, type=float,
                        help='Cutoff probability in pruning,default 1.0, no pruning.')
 beam_args.add_argument('--lm_workers', default=1, type=int, help='Number of LM processes to use')
 args = parser.parse_args()
+
+def get_filename_list(manifest):
+    with open(manifest) as f:
+        lines = list(f)
+    filename_list = []
+    for line in lines:
+        seg = line.split('/')
+        filename_list.append(seg[-1][:-5])
+    return filename_list
 
 if __name__ == '__main__':
     model = DeepSpeech.load_model(args.model_path, cuda=args.cuda)
@@ -61,9 +71,14 @@ if __name__ == '__main__':
                                   num_workers=args.num_workers)
     total_cer, total_wer = 0, 0
     output_data = []
+
+    filename_list = get_filename_list(args.test_manifest)
+    print(filename_list)
+    spec_path = 'data/spec/fsgm/'
+    print('read from '+spec_path)
     for i, (data) in tqdm(enumerate(test_loader), total=len(test_loader)):
         inputs, targets, input_percentages, target_sizes = data
-
+        inputs = torch.from_numpy(np.load(spec_path + filename_list[i] + '0.25.npy').reshape(1,1,161,-1))
         inputs = Variable(inputs, volatile=True)
 
         # unflatten targets
