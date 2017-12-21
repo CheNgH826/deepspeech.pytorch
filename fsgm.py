@@ -4,14 +4,6 @@ import json
 import os
 import time
 import numpy as np
-'''
-this is from hung cheng blablbalbalb
-this is from hung cheng blablbalbalb
-this is from hung cheng blablbalbalb
-this is from hung cheng blablbalbalb
-this is from hung cheng blablbalbalb
-this is from hung cheng blablbalbalb
-'''
 
 import torch
 from tqdm import tqdm
