@@ -204,10 +204,10 @@ if __name__ == '__main__':
             loss.backward()
 
             clean_spec = inputs.data.cpu().numpy()
-            np.save(spec_path+'clean/'+spec_filelist[i], clean_spec)
+            np.save(spec_path+'clean/'+spec_filelist[i], clean_spec.reshape(161, -1))
             print('clean spec saved!!')
             fsgmed = fsgm(inputs.data.cpu().numpy(), inputs.grad.data.cpu().numpy(), 0.25)
-            np.save(spec_path+'fsgm/'+spec_filelist[i]+'0.25', fsgmed)
+            np.save(spec_path+'fsgm/'+spec_filelist[i]+'0.25', fsgmed.reshape(161, -1))
             print('fsgm spec saved!!')
 
             torch.nn.utils.clip_grad_norm(model.parameters(), args.max_norm)
