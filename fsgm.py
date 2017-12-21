@@ -1,10 +1,17 @@
-import panda as pd
 import argparse
 import errno
 import json
 import os
 import time
 import numpy as np
+'''
+this is from hung cheng blablbalbalb
+this is from hung cheng blablbalbalb
+this is from hung cheng blablbalbalb
+this is from hung cheng blablbalbalb
+this is from hung cheng blablbalbalb
+this is from hung cheng blablbalbalb
+'''
 
 import torch
 from tqdm import tqdm
@@ -243,7 +250,7 @@ if __name__ == '__main__':
         start_iter = 0  # Reset start iteration for next epoch
         total_cer, total_wer = 0, 0
         model.eval()
-        '''
+        
         for i, (data) in tqdm(enumerate(test_loader), total=len(test_loader)):
             inputs, targets, input_percentages, target_sizes = data
 
@@ -288,7 +295,6 @@ if __name__ == '__main__':
               'Average WER {wer:.3f}\t'
               'Average CER {cer:.3f}\t'.format(
             epoch + 1, wer=wer, cer=cer))
-            '''
 
         if args.checkpoint:
             file_path = '%s/deepspeech_%d.pth.tar' % (save_folder, epoch + 1)
