@@ -16,21 +16,31 @@ import numpy as np
 
 
 
-def spectrogram2wav(spectrogram):
+def spectrogram2wav(spectrogram , phase):
     '''
     spectrogram: [t, f], i.e. [t, nfft // 2 + 1]
     '''
-    spectrogram = spectrogram.T  # [f, t]
-    X_best = copy.deepcopy(spectrogram)  # [f, t]
-    #for i in range(30):
+    
+    X_t = copy.deepcopy(spectrogram)  # [f, t]
+    phasenp = copy.deepcopy(phase)
+    print(X_t.shape)
+    print(phasenp.shape)
+    X_t = X_t*phasenp
+    X_t = invert_spectrogram(X_t)
+    
+    '''
+    for i in range(10):
+        X_t = invert_spectrogram(X_best)
+        est = librosa.stft(X_t, 320, 160, win_length=320)  # [f, t]
+        phase = est / np.maximum(1e-8, np.abs(est))  # [f, t]
+        phase = np.concatenate((phase, np.ones((161, X_best.shape[0]-161))), axis=1)
+        X_best = spectrogram * phase  # [f, t]
     X_t = invert_spectrogram(X_best)
-    shape = X_t.shape
-    est = librosa.stft(X_t, 320, 160, win_length=320)  # [f, t]
-    phase = est / np.maximum(1e-8, np.abs(est))  # [f, t]
-    phase = np.concatenate((phase, np.ones((161, X_best.shape[0]-161))), axis=1)
-    X_best = spectrogram.T * phase  # [f, t]
-    X_t = invert_spectrogram(X_best)
-
+    sp = X_t.shape
+    print(sp)   
+    ''' 
+    
+    #X_t = invert_spectrogram(spectrogram)
     return X_t
 
 def invert_spectrogram(spectrogram):

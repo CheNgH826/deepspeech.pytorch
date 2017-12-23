@@ -14,15 +14,15 @@ def argparser():
 	parser.add_argument('--sr', type=int, default=16000)
 	parser.add_argument('--outdir', type=str, default='output')
 	parser.add_argument('--spec',type=str, required=True)
-	#parser.add_argument('--figsize', type=tuple, default=(12, 8))
+	parser.add_argument('--phase', type=str , required=False)
 	args = parser.parse_args()
 	return args
 
 
 
-def spec2audio(spectrogram):
+def spec2audio(spectrogram , phase):
 	
-	soundarray = spg.spectrogram2wav(spectrogram)
+	soundarray = spg.spectrogram2wav(spectrogram , phase)
 	librosa.output.write_wav(outdir+'/converted-{0}'.format(wav_file), soundarray, sr)
 
 if __name__ == "__main__":
@@ -32,9 +32,10 @@ if __name__ == "__main__":
 	sr 			= args.sr 		# sample rate
 	spec	    = np.load(args.spec)
 	outdir		= args.outdir
-	#figsize		= args.figsize
+	phase       = np.load(args.phase)
+	#phase = 0
 	if not os.path.exists(outdir):
 		os.mkdir(outdir)
-	spec2audio(spec)
+	spec2audio(spec , phase)
 
     
