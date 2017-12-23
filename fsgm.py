@@ -165,6 +165,7 @@ if __name__ == '__main__':
         model.train()
         end = time.time()
         for i, (data) in enumerate(train_loader, start=start_iter):
+            exit(-1)
             if i == len(train_sampler):
                 break
             inputs, targets, input_percentages, target_sizes = data

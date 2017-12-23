@@ -109,8 +109,10 @@ class SpectrogramParser(AudioParser):
         win_length = n_fft
         hop_length = int(self.sample_rate * self.window_stride)
         # STFT
+        print(y.shape)
         D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
                          win_length=win_length, window=self.window)
+        print(D.shape)
         spect, phase = librosa.magphase(D)
         # S = log(S+1)
         spect = np.log1p(spect)
