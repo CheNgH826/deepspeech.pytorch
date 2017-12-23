@@ -2,7 +2,7 @@ import os
 import subprocess
 from tempfile import NamedTemporaryFile
 from torch.utils.data.sampler import Sampler
-
+from tempfile import TemporaryFile
 import librosa
 import numpy as np
 import scipy.signal
@@ -14,6 +14,7 @@ from torch.utils.data import Dataset
 windows = {'hamming': scipy.signal.hamming, 'hann': scipy.signal.hann, 'blackman': scipy.signal.blackman,
            'bartlett': scipy.signal.bartlett}
 
+phase_path = 'data/spec/phase'
 
 def load_audio(path):
     sound, _ = torchaudio.load(path)
@@ -96,7 +97,7 @@ class SpectrogramParser(AudioParser):
             'noise_dir') is not None else None
         self.noise_prob = audio_conf.get('noise_prob')
 
-    def parse_audio(self, audio_path):
+    def parse_audio(self, audio_path , outnum=0):
         if self.augment:
             y = load_randomly_augmented_audio(audio_path, self.sample_rate)
         else:
@@ -111,7 +112,14 @@ class SpectrogramParser(AudioParser):
         # STFT
         D = librosa.stft(y, n_fft=n_fft, hop_length=hop_length,
                          win_length=win_length, window=self.window)
-        spect, phase = librosa.magphase(D)
+        
+        spect, phase = librosa.magphase(D) 
+        #phase = np.log1p(phase)
+        np.save('try.npy' , phase)#save phase
+        print("saved")
+        phs = phase.shape
+        print(phs)
+        outnum= outnum+1
         # S = log(S+1)
         spect = np.log1p(spect)
         spect = torch.FloatTensor(spect)
@@ -120,7 +128,7 @@ class SpectrogramParser(AudioParser):
             std = spect.std()
             spect.add_(-mean)
             spect.div_(std)
-
+        
         return spect
 
     def parse_transcript(self, transcript_path):
